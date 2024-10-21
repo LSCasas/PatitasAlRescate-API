@@ -20,6 +20,15 @@ const userSchema = new mongoose.Schema({
     phone: {
         type: String,
         required: true,
+    },
+    type: { 
+        type: String,
+        required: true, 
+        enum: ['donante', 'banco'], 
+    },
+    location: { 
+        type: String,
+        required: true, 
     }
 }, {
     timestamps: true,
@@ -28,4 +37,5 @@ const userSchema = new mongoose.Schema({
 const User = mongoose.model('User', userSchema);
 
 module.exports = User;
+
 

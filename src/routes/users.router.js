@@ -5,7 +5,7 @@ const auth = require('../middleware/auth.middleware');
 
 const router = express.Router();
 
-
+// Obtener todos los usuarios
 router.get('/', async (req, res) => {
   try {
     const users = await userUseCase.getAll();
@@ -21,36 +21,37 @@ router.get('/', async (req, res) => {
   }
 });
 
-
+// Crear un nuevo usuario
 router.post('/', async (req, res) => {
   try {
-    const { name, email, password, phone } = req.body;
+    const { name, email, password, phone, type, location } = req.body;
 
+    // Verificar si el correo electrónico ya está en uso
     const existingUser = await userUseCase.getByEmail(email);
     if (existingUser) {
       throw createError(400, 'El correo electrónico ya está en uso');
     }
 
-   
-    if (!name || !email || !password || !phone) {
-      throw createError(400, 'Faltan campos requeridos (name, email, password, phone)');
+    // Validar campos requeridos
+    if (!name || !email || !password || !phone || !type || !location) {
+      throw createError(400, 'Faltan campos requeridos (name, email, password, phone, type, location)');
     }
 
-   
-    const userCreated = await userUseCase.create({ name, email, password, phone });
+    // Crear el usuario
+    const userCreated = await userUseCase.create({ name, email, password, phone, type, location });
     res.status(201).json({
       success: true,
       data: { user: userCreated },
     });
   } catch (error) {
-    res.status(400).json({
+    res.status(error.status || 400).json({
       success: false,
       error: error.message,
     });
   }
 });
 
-
+// Obtener un usuario por ID
 router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params;
@@ -70,6 +71,23 @@ router.get('/:id', async (req, res) => {
   }
 });
 
+// Obtener usuarios por tipo
+router.get('/type/:type', async (req, res) => {
+  try {
+    const { type } = req.params;
+    const usersByType = await userUseCase.getByType(type);
+    res.json({
+      success: true,
+      data: { users: usersByType },
+    });
+  } catch (error) {
+    res.status(error.status || 500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+});
 
 module.exports = router;
+
 
