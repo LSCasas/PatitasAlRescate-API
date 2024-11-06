@@ -33,8 +33,13 @@ router.post('/', async (req, res) => {
     }
 
     // Validar campos requeridos
-    if (!name || !email || !password || !phone || !type || !location) {
-      throw createError(400, 'Faltan campos requeridos (name, email, password, phone, type, location)');
+    if (!name || !email || !password || !phone || !type) {
+      throw createError(400, 'Faltan campos requeridos (name, email, password, phone, type)');
+    }
+
+    // Validar que "location" sea requerido solo para el tipo "banco"
+    if (type === "banco" && !location) {
+      throw createError(400, 'El campo "location" es requerido para el tipo "banco"');
     }
 
     // Crear el usuario
@@ -89,5 +94,7 @@ router.get('/type/:type', async (req, res) => {
 });
 
 module.exports = router;
+
+
 
 

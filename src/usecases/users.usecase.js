@@ -17,8 +17,10 @@ async function create(data) {
         if (!data.type) {
             throw createError(400, "User type is required");
         }
-        if (!data.location) {
-            throw createError(400, "User location is required");
+
+        // Validar location solo si el tipo de usuario es 'banco'
+        if (data.type === 'banco' && !data.location) {
+            throw createError(400, "User location is required for bank users");
         }
 
         // Encriptar la contraseña
@@ -83,3 +85,4 @@ module.exports = {
     getByEmail,
     getByType,
 };
+

@@ -28,7 +28,7 @@ const userSchema = new mongoose.Schema({
     },
     location: { 
         type: String,
-        required: true, 
+        default: null  // Si no se especifica, será null
     }
 }, {
     timestamps: true,
@@ -37,5 +37,6 @@ const userSchema = new mongoose.Schema({
 const User = mongoose.model('User', userSchema);
 
 module.exports = User;
+
 
 

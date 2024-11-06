@@ -1,9 +1,43 @@
 const express = require('express');
 const router = express.Router();
-const authMiddleware = require('../middleware/auth.middleware');
 const Donation = require('../models/donations.model');
+const createError = require('http-errors'); // Asegúrate de tener http-errors instalado
 
-router.post('/', authMiddleware, async (req, res) => {
+// Función para obtener todas las donaciones
+async function getAllDonations() {
+    try {
+        // Obtener todas las donaciones de la base de datos
+        const donations = await Donation.find();  // Dependiendo del modelo y base de datos, puedes agregar opciones como .populate() si es necesario
+        
+        if (!donations || donations.length === 0) {
+            throw createError(404, 'No se encontraron donaciones');
+        }
+
+        return donations;  // Devuelve todas las donaciones encontradas
+    } catch (error) {
+        throw createError(500, 'Error al obtener las donaciones');
+    }
+}
+
+// Endpoint para obtener todas las donaciones
+router.get('/', async (req, res) => {
+    try {
+        const donations = await getAllDonations();
+        res.status(200).json({
+            success: true,
+            data: donations
+        });
+    } catch (error) {
+        console.error('Error al obtener las donaciones', error);
+        res.status(error.status || 500).json({
+            success: false,
+            error: error.message || 'Error al obtener las donaciones'
+        });
+    }
+});
+
+// Endpoint para crear una nueva donación
+router.post('/', async (req, res) => {
   try {
     const {
       food,
@@ -15,8 +49,6 @@ router.post('/', authMiddleware, async (req, res) => {
       deliveryAddress,
     } = req.body;
 
-    const userId = req.user.id;
-
     const newDonation = await Donation.create({
       food,
       quantity,
@@ -25,7 +57,6 @@ router.post('/', authMiddleware, async (req, res) => {
       donorName,
       donorContact,
       deliveryAddress,
-      user: userId
     });
 
     res.status(201).json({
@@ -43,7 +74,5 @@ router.post('/', authMiddleware, async (req, res) => {
 });
 
 module.exports = router;
-
-
 
 
